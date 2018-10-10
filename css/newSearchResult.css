@@ -1,0 +1,85 @@
+html body{
+	background-color: #FFFFFF;
+	font-size: 0.30rem;
+}
+.mui-content{
+	background-color: #FFFFFF; !important;
+}
+
+.NoResult-info{
+	text-align:center ;
+	font-size: 0.28rem;
+	line-height: 1.2rem;
+	display: none;
+}
+.NoResult-info span{
+	padding-right: 0.2rem;
+}
+
+.searchResultTitle{
+	width: 100%;
+	text-align: center;
+	margin-top: 0.5rem;
+}
+.searchResultList{
+ margin-top: 0.2rem;
+}
+.searchResultList:last-child{
+	margin-bottom: 0.5rem;
+}
+.resultItem{
+	position: relative;
+	font-size: 0.28rem;
+	width: 95%;
+	margin: 0 auto;
+	border: 1px solid #FFFFFF;
+	border-radius: 0.15rem;
+	clear: both;
+	overflow: auto;
+	color: #FFFFFF;
+	background-color: #FEA331;
+	margin-top: 0.3rem;
+}
+.resultItemTitle{
+	text-align: center;
+}
+.resultItemVlue{
+	text-align: center;
+}
+.Item-list{
+	float: left;
+	/*border: 1px solid #B6B6B6;*/
+	text-align: center;
+	overflow: hidden;
+	/*padding: 0 0.1rem;*/
+}
+.Item-list span{
+	display: block;
+	margin-top: 0.2rem;
+	height: 50%;
+}
+.productModul{
+	width: 16%;
+}
+.loandModule{
+	width: 27%;
+}
+.waitPayModule{
+	width: 33%;
+}
+.reportModule{
+	width: 24%;
+}
+.productName,.loanMoney,.waitPay,.report{
+	margin-top: 0.4rem !important;
+	margin-bottom: 0.2rem;
+}
+.centerLine{
+	
+	width: 100%;
+	margin: 0 auto;
+	position: absolute;
+	top: 50%;
+	/*left: 4%;*/
+	border-bottom: 1px solid #FFFFFF;
+}

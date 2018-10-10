@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>321征信</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black">
+        <link rel="stylesheet" href="../css/mui.min.css">
+        <link rel="stylesheet" href="../css/common.css"/>
+        <link href="../css/queryResult.css" rel="stylesheet"/>
+        <script type="text/javascript" src="../js/rem.js"></script>
+        <script type="text/javascript" src="../js/jquery-1.11.1.min.js"></script>
+        <script src="../js/mui.min.js"></script>
+        <script src="../js/common.js"></script>
+        <style>
+            body {
+                background: #fff;
+            }
+        </style>
+    </head>
+    <body>
+        <header class="mui-bar mui-bar-nav">
+            <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+            <h1 class="mui-title">结果详情</h1>
+            <a href="#myOpinion" id="GoMyOpinion">留言</a>
+        </header>
+        <div class="mui-content queryDetail queryPage">
+            <div class="itemContent">
+                <div class="list-item">
+                    <div class="list-tit clearfloat">
+                        <em class="head fl"></em>
+                        <p class="fl">基本信息</p>
+                    </div>
+                    <em class="greyLine"></em>
+                    <img class="my-img" src="../images/query/splitLine.png"/>
+                    <div class="list-txt" id="dataAdd1"></div>
+                </div>
+                <div class="list-item list-emergencyContact">
+                    <div class="list-tit clearfloat">
+                        <em class="much fl"></em>
+                        <p class="fl">紧急联系人信息</p>
+                    </div>
+                    <em class="greyLine"></em>
+                    <img class="my-img" src="../images/query/splitLine.png"/>
+                    <div class="list-txt" id="dataAdd2"></div>
+                </div>
+                <div class="list-item list-contactList">
+                    <div class="list-tit clearfloat">
+                        <em class="fri fl"></em>
+                        <p class="fl">通讯录联系人信息</p>
+                        <p class="fr">只随机展示3位</p>
+                    </div>
+                    <em class="greyLine"></em>
+                    <img class="my-img" src="../images/query/splitLine.png"/>
+                    <div class="list-txt" id="dataAdd3"></div>
+                </div>
+                <div class="list-item list-otherInfo">
+                    <div class="list-tit clearfloat">
+                        <em class="info fl"></em>
+                        <p class="fl">其他信息</p>
+                    </div>
+                    <em class="greyLine"></em>
+                    <img class="my-img" src="../images/query/splitLine.png"/>
+                    <div class="list-txt" id="dataAdd4"></div>
+                </div>
+                <div class="list-item list-photos">
+                    <div class="list-tit clearfloat">
+                        <em class="idcard fl"></em>
+                        <p class="fl">身份证</p>
+                    </div>
+                    <em class="greyLine"></em>
+                    <img class="my-img" src="../images/query/splitLine.png"/>
+                    <div class="list-txt list-img">
+                        <div class="limg" id="faceImgDiv">
+                            <div class="faceImg pimg" id="faceImg"></div>
+                            <p>正面</p>
+                        </div>
+                        <div class="limg" id="backImgDiv">
+                            <div class="backImg pimg" id="backImg"></div>
+                            <p>反面</p>
+                        </div>
+                        <div class="limg" id="bodyImgDiv">
+                            <div class="bodyImg pimg" id="bodyImg"></div>
+                            <p>手持活体</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="list-item list-myOpinion" id="myOpinion">
+                    <div class="list-tit clearfloat">
+                        <em class="message fl"></em>
+                        <p class="fl">留言区</p>
+                    </div>
+                    <em class="greyLine"></em>
+                    <img class="my-img" src="../images/query/splitLine.png"/>
+                    <div class="list-txt">
+                        <textarea placeholder="留言如有疑问，可点击留言，我们将转至产品所属机构" name="reason" id="reason" class="reason" maxlength="200"></textarea>
+                        <div class="btnSubmitDiv">
+                            <button type="submit" class="submitBtn submitGrey">提交留言</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
+<script>
+    let birthdayVal = localStorage.getItem("queryDetail_birthday");
+    let mobileVal = localStorage.getItem("queryDetail_mobile");
+    let orderNoVal = localStorage.getItem("queryDetail_orderNo");
+    let randomCodeVal = localStorage.getItem("queryDetail_randomCode");
+    let smsCodeVal = localStorage.getItem("queryDetail_smsCode");
+    let uuidVal = localStorage.getItem("queryDetail_uuid");
+    let reportStatusVal = localStorage.getItem("queryDetail_reportStatus");
+    function initData() {
+        if (birthdayVal != null && mobileVal != null && orderNoVal != null && randomCodeVal != null && smsCodeVal != null) {
+            var getDetailArgs = JSON.stringify({
+                birthday: birthdayVal,
+                mobile: mobileVal,
+                orderNo: orderNoVal,
+                randomCode: randomCodeVal,
+                smsCode: smsCodeVal,
+                uuid: uuidVal
+            });
+
+            mui.ajax(configData.URL + '/rs/api/credit/getDetail.action', {
+                data: getDetailArgs,
+                dataType: 'json',
+                contentType: 'application/json',
+                type: 'post',
+                timeout: 10000,
+                success: function(data) {
+                    if (data.code == "200") {
+                        console.log(data)
+                        //基本信息
+                        var dataUserInfo = data.data.report.userInfo;
+                        var str1 = `<p style="display: ${dataUserInfo.userName ? 'block' : 'none'}">姓名： ${dataUserInfo.userName} </p>
+                        <p style="display: ${dataUserInfo.idCard ? 'block' : 'none'}">身份证：  ${dataUserInfo.idCard}   </p>
+                        <p>手机号：  ${dataUserInfo.mobile == undefined ? mobileVal : dataUserInfo.mobile}   </p>
+                        <p style="display: ${dataUserInfo.productName ? 'block' : 'none'}">借款产品：  ${dataUserInfo.productName}   </p>
+                        <p>状态：  ${reportStatusVal}  </p>`
+                        $('#dataAdd1').append(str1);
+
+                        //紧急联系人信息
+                        var dataEmergencyContact = data.data.report.emergencyContact;
+                        if (Object.getOwnPropertyNames(dataEmergencyContact).length > 0) {
+                            var str2 = `<p style="display: ${dataEmergencyContact.contactAName ? 'block' : 'none'}">紧急联系人A姓名： ${dataEmergencyContact.contactAName} </p>
+                            <p style="display: ${dataEmergencyContact.contactAMobile ? 'block' : 'none'}">紧急联系人A电话：  ${dataEmergencyContact.contactAMobile}   </p>
+                            <p style="display: ${dataEmergencyContact.contactARelation ? 'block' : 'none'}">与紧急联系人A关系：  ${dataEmergencyContact.contactARelation}   </p>
+                            <p style="display: ${dataEmergencyContact.contactBName ? 'block' : 'none'}">紧急联系人B姓名：  ${dataEmergencyContact.contactBName}   </p>
+                            <p style="display: ${dataEmergencyContact.contactBMobile ? 'block' : 'none'}">紧急联系人B电话：  ${dataEmergencyContact.contactBMobile}   </p>
+                            <p style="display: ${dataEmergencyContact.contactBRelation ? 'block' : 'none'}">与紧急联系人B关系：  ${dataEmergencyContact.contactBRelation}  </p>`
+                            $('#dataAdd2').append(str2);
+                        } else {
+                            $(".list-emergencyContact").hide();
+                        }
+
+                        //通讯录联系人信息
+                        var dataContactList = data.data.report.contactList;
+                        if (dataContactList.length > 0) {
+                            var str3 = `<p style="display: ${dataContactList[0].contactMobile ? 'block' : 'none'}">联系人A姓名： ${dataContactList[0].contactMobile} </p>
+                            <p style="display: ${dataContactList[0].contactName ? 'block' : 'none'}">联系人A电话：  ${dataContactList[0].contactName}   </p>
+                            <p style="display: ${dataContactList[1].contactMobile ? 'block' : 'none'}">联系人B姓名：  ${dataContactList[1].contactMobile}   </p>
+                            <p style="display: ${dataContactList[1].contactName ? 'block' : 'none'}">联系人B电话：  ${dataContactList[1].contactName}   </p>
+                            <p style="display: ${dataContactList[2].contactMobile ? 'block' : 'none'}">联系人C姓名：  ${dataContactList[2].contactMobile}   </p>
+                            <p style="display: ${dataContactList[2].contactName ? 'block' : 'none'}">联系人C电话：  ${dataContactList[2].contactName}  </p>`;
+                            $('#dataAdd3').append(str3);
+                        } else {
+                            $(".list-contactList").hide();
+                        }
+
+                        //其他信息
+                        var dataOtherInfo = data.data.report.otherInfo;
+                        if (Object.getOwnPropertyNames(dataOtherInfo).length > 0) {
+                            var str4 = `<p style="display: ${dataOtherInfo.workUnit ? 'block' : 'none'}">工作单位： ${dataOtherInfo.workUnit} </p>
+                            <p style="display: ${dataOtherInfo.homeAddress ? 'block' : 'none'}">家庭住址： ${dataOtherInfo.homeAddress}  </p>`;
+                            $('#dataAdd4').append(str4);
+                        } else {
+                            $(".list-otherInfo").hide();
+                        }
+
+                        //身份证
+                        var dataPhotos = data.data.report.photos;
+                        if (Object.getOwnPropertyNames(dataPhotos).length > 0) {
+                            if(dataPhotos.IDNegative){
+                                var photos1 = new Image();
+                                photos1.className = "my-img";
+                                photos1.src = dataPhotos.IDNegative;
+                                document.getElementById("faceImg").appendChild(photos1);
+                            }else{
+                                $("#faceImgDiv").hide();
+                            }
+                            if(dataPhotos.IDPositive){
+                                var photos2 = new Image();
+                                photos2.className = "my-img";
+                                photos2.src = dataPhotos.IDPositive;
+                                document.getElementById("backImg").appendChild(photos2);
+                            }else{
+                                $("#backImgDiv").hide();
+                            }
+                            if(dataPhotos.LivingPhoto){
+                                var photos3 = new Image();
+                                photos3.className = "my-img";
+                                photos3.src = dataPhotos.LivingPhoto;
+                                document.getElementById("bodyImg").appendChild(photos3);
+                            }else{
+                                $("#bodyImgDiv").hide();
+                            }
+
+                       
+                        } else {
+                            $(".list-photos").hide();
+                        }
+                    } else {
+                        mui.toast(data.msg);
+                    }
+                },
+                error: function(xhr, type, errorThrown) {
+                    //异常处理；
+                    console.log(type);
+                }
+            });
+        }
+    }
+    $(function() {
+        initData();
+
+        $(".reason").keyup(function() {
+            var reasonVal = $(this).val();
+            var reasonValLen = reasonVal.length;
+            if (reasonValLen > 0) {
+                $(".submitBtn").removeClass("submitGrey").addClass("submitActive");
+            } else {
+                $(".submitBtn").removeClass("submitActive").addClass("submitGrey");
+            }
+        })
+        $(".submitBtn").click(function() {
+            let canSubmit = true;
+            if ($(this).hasClass("submitGrey")) {
+                return;
+            }
+            $(".submitBtn").removeClass("submitActive").addClass("submitGrey");
+            var timer = setTimeout(function() {
+                $(".submitBtn").removeClass("submitGrey").addClass("submitActive");
+            }, 5000);
+            var remarkVal = $("#reason").val();
+            var remarkValLen = remarkVal.length;
+            if (remarkValLen > 0) {
+                var saveUserMsgArgs = JSON.stringify({
+                    mobile: mobileVal,
+                    orderNo: orderNoVal,
+                    remark: remarkVal,
+                });
+                mui.ajax(configData.URL + '/rs/api/credit/saveUserMsg.action', {
+                    data: saveUserMsgArgs,
+                    dataType: 'json',
+                    contentType: 'application/json',
+                    type: 'post',
+                    timeout: 10000,
+                    success: function(data) {
+                        if (data.code == "200") {
+                            mui.toast(data.msg);
+                        } else {
+                            mui.toast(data.msg);
+                        }
+                    },
+                    error: function(xhr, type, errorThrown) {
+                        //异常处理；
+                        console.log(type);
+                    }
+                });
+            }
+        });
+    });
+</script>

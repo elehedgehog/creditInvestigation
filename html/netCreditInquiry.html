@@ -1,0 +1,142 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>321征信</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+	<link href="../css/mui.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="../css/netCreditInquiry.css"/>
+    <link rel="stylesheet" href="../css/common.css"/>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge"><script type="text/javascript" src="../js/rem.js" ></script>
+    <script type="text/javascript" src="../js/jquery-1.11.1.min.js" ></script>
+    <script type="text/javascript" src="../js/common.js" ></script>
+    <script src="../js/mui.min.js"></script>
+</head>
+<body>
+    <header class="mui-bar mui-bar-nav">
+        <!-- <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a> -->
+        <h1 class="mui-title">首页</h1>
+    </header>
+    <div class="mui-content" id="content">
+        <div class="header-title">
+            <p class="header-title-search">321征信正式上线，可查逾期记录</p>
+            <p class="header-title-brand">乐宝宝，随薪贷等品牌首批入驻</p>
+        </div>
+        <div class="content-top">
+            <p class="font-color content-top-import">重要通知：网贷逾期不还款将报送纳入征信体系！</p>
+            <p class="content-top-msg">《关于报送P2P平台借款人逃废债信息的通知》
+                <a href="msgInform.html">点此看原文</a>
+            </p>
+        </div>
+        <div class="content-center">
+            <p class="content-center-header">已上报逾期借款人名单</p>
+            <div class="content-center-msg">
+                <p class="font-color msg-title">下述逾期借款人，已上报至监管部门纳入征信体系</p>
+                <div class="content-slide report-list">
+                    <ul>
+                    </ul>
+                </div>
+                
+            </div>
+        </div>
+        <div class="content-bottom">
+            <p class="content-bottom-header">拟上报逾期借款人名单</p>
+            <div class="content-center-msg">
+                <p class="font-color msg-title">下述逾期借款人，如不及时还款，将上报至监管部门纳入征信体系</p>
+                <div class="content-slide unReport-list">
+                    <ul>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <p class="content-search">查查看您认识的Ta是否在名单里，点此<a class="queryList">立即查询</a></p>
+        <div class="content-us">
+            <span class="content-us-our"><a href="aboutUs.html">关于我们</a></span>
+            <span class="content-us-brand"><a href="enteringBrand.html">已入驻品牌</a></span>
+        </div>
+        <div class="seach-btn queryList">
+            <span>查询名单</span>
+        </div>
+    </div>
+</body>
+<script>
+    var baseUrl = configData.URL
+    console.log(configData.URL)
+    var page = 1 //当前第几页
+    var pageSize = 10  //页码大小
+    var allPages = 1   //总页数
+    var totalSize = 0     //当前显示的总条数
+    var totalSize = 0     //总条数
+    var hasNext = false  // 是否有下一页
+    var disCreditListOne = []
+    var disCreditListtwo = []
+
+    var params = JSON.stringify(
+        {   page: page,
+            pageSize: pageSize,
+            reported: 1, 
+        }
+    )
+    //名单屏幕滚动
+    function autoScroll(key) {
+        $("." + key + " ul").animate({
+            marginTop: "-.5rem"
+        }, 500, function () {
+            $(this).css({ marginTop: "0px" }).find("li:first").appendTo(this);
+        })
+    }
+    //分页查询已上报或拟上报失信人员
+    mui.ajax( baseUrl + '/rs/api/credit/getDiscreditListByPage.action',{ 
+        data: params,
+        dataType: 'json',
+        contentType: 'application/json;charset=UTF-8',
+        type: 'post',
+        timeout: 10000,
+        success:function(data) {
+             if(data.code == "200"){
+                console.log(data)
+                totalSize = data.data.totalSize
+                hasNext = data.data.hasNext  
+                disCreditListOne = data.data.reportList
+                disCreditListtwo = data.data.unReportList
+    
+                 //人员数据遍历填充
+                $.each(disCreditListOne,function(name,value) { 
+                    var str = '<li><span>'+value.userName+'</span><span>'+value.idCard+'</span></li>' 
+                    $('.report-list ul').append(str)
+
+                });
+                $.each(disCreditListtwo,function(name,value) {
+                    var str = '<li><span>'+value.userName+'</span><span>'+value.idCard+'</span></li>' 
+                    $('.unReport-list ul').append(str)
+                    
+                });
+
+                
+                $(function () {
+                    if ($(".report-list ul li").length > 2) {
+                        setInterval('autoScroll("report-list")', 2000);
+                    }
+                    
+                    if ($(".unReport-list ul li").length > 2) {
+                        setInterval('autoScroll("unReport-list")', 2000);
+                    }
+                })
+
+            } else {
+                mui.toast(data.msg);
+            }
+        },
+        error:function(xhr,type,errorThrown){
+            console.log(type);
+        }
+    });
+    
+    
+    //查询名单，立即查询按钮
+    $('.queryList').on('click', function() {
+        window.location.href="searchPage.html"
+    })
+</script>
+</html>

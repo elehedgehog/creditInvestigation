@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>逾期名单查询</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black">
+        <link rel="stylesheet" href="../css/mui.min.css">
+        <link rel="stylesheet" href="../css/mui.pullToRefresh.css">
+        <link href="../css/queryResult.css" rel="stylesheet"/>
+        <script type="text/javascript" src="../js/rem.js"></script>
+        <script type="text/javascript" src="../js/jquery-1.11.1.min.js"></script>
+        <style>
+            body {
+                background: #fff;
+            }
+        </style>
+    </head>
+    <body>
+        <header class="mui-bar mui-bar-nav">
+            <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+            <h1 class="mui-title">逾期名单查询</h1>
+        </header>
+        <div class="mui-content queryResult queryPage" id="ResultPart1" style="display: none;">
+            <div class="queryTime">
+                <div class="title">对"陈老赖"的查询结果</div>
+                <em class="greyLine"></em>
+                <img class="my-img" src="../images/query/greyLine.png"/>
+                <div class="noResult">
+                    <p>
+                        暂无查询结果 <a href="#">重填查询内容</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="mui-content queryResult queryPage" id="ResultPart2">
+            <div class="queryScroll">
+                <div id="slider" class="mui-slider mui-fullscreen" style="top:44px;">
+                    <div id="sliderSegmentedControl" class="mui-scroll-wrapper mui-slider-indicator mui-segmented-control mui-segmented-control-inverted">
+                        <div class="mui-scroll menuTime">
+                            <a class="mui-control-item mui-active" href="#item1mobile">已上报
+                            </a>
+                            <a class="mui-control-item" href="#item2mobile">拟上报
+                            </a>
+                        </div>
+                    </div>
+                    <div class="mui-slider-group">
+                        <div id="item1mobile" class="mui-slider-item mui-control-content mui-active">
+                            <p class="menuP">下述逾期借款人，已上报至监管部门纳入征信体系，如有疑问可点击【详情】，查询更多信息并进行留言</p>
+                            <div class="scrollContent" id="scrollContent1">
+                                <div id="scroll1" class="mui-scroll-wrapper">
+                                    <div class="mui-scroll">
+                                        <ul class="mui-table-view" id="scroll1"></ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="noDataNow1 noDataNow" style="display: none;">暂无数据</div>
+                        </div>
+                        <div id="item2mobile" class="mui-slider-item mui-control-content">
+                            <p class="menuP">下述逾期借款人，已上报至监管部门纳入征信体系，如有疑问可点击【详情】，查询更多信息并进行留言</p>
+                            <div class="scrollContent" id="scrollContent2">
+                                <div class="mui-scroll-wrapper">
+                                    <div class="mui-scroll">
+                                        <ul class="mui-table-view" id="scroll2"></ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="noDataNow2 noDataNow" style="display: none;">暂无数据</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script src="../js/mui.min.js"></script>
+        <script src="../js/mui.pullToRefresh.js"></script>
+        <script src="../js/mui.pullToRefresh.material.js"></script>
+        <script>
+            //加载更多
+            var pageSize = 15;
+            //每页显示条数
+            var counter = 1;
+            //计数器
+            var pageStart = 0;
+
+            mui.init();
+
+            initData1();
+            function initData1() {
+                $.getJSON("query.json", function(data) {
+                    var dataReportList = data.data.reportList;
+                    var dataReportListLen = dataReportList.length;
+                    var li;
+                    var ul = document.getElementById('scroll1');
+                    if (dataReportListLen > 0) {
+                        $.each(dataReportList, function(key, val) {
+                            var detailLink = "/html/netCreditInquiry.html?userName=" + val.userName + "&idCard=" + val.idCard + "&orderNo=" + val.orderNo;
+                            li = document.createElement('li');
+                            li.className = 'mui-table-view-cell';
+                            li.innerHTML = `<div class="boxmsg"><p class="boxName">姓名： ${val.userName} </p>
+                            <p class="boxIdCard">身份证： ${val.idCard}</p>
+                            <p class="boxDetail">详情： <a href= ${detailLink} >点击查看</a></p></div>`;
+                            ul.appendChild(li);
+                        });
+                    } else {
+                        $("#scrollContent1").hide();
+                        $(".noDataNow1").show();
+                    }
+                });
+            }
+
+            initData2();
+            function initData2() {
+                $.getJSON("query.json", function(data) {
+                    var dataUnReportList = data.data.unReportList;
+                    var dataUnReportListLen = dataUnReportList.length;
+                    var li;
+                    var ul = document.getElementById('scroll2');
+
+                    if (dataUnReportListLen > 0) {
+                        $.each(dataUnReportList, function(key, val) {
+                            var detailLink = "/html/netCreditInquiry.html?userName=" + val.userName + "&idCard=" + val.idCard + "&orderNo=" + val.orderNo;
+                            li = document.createElement('li');
+                            li.className = 'mui-table-view-cell';
+                            li.innerHTML = `<div class="boxmsg"><p class="boxName">姓名： ${val.userName} </p>
+                            <p class="boxIdCard">身份证： ${val.idCard}</p>
+                            <p class="boxDetail">详情： <a href= ${detailLink} >点击查看</a></p></div>`;
+                            ul.appendChild(li);
+                        });
+                    } else {
+                        $("#scrollContent2").hide();
+                        $(".noDataNow2").show();
+                    }
+
+                });
+            }
+
+            (function($) {
+
+                //阻尼系数
+                var deceleration = mui.os.ios ? 0.003 : 0.0009;
+                $('.mui-scroll-wrapper').scroll({
+                    bounce: false,
+                    indicators: true,
+                    //是否显示滚动条
+                    deceleration: deceleration
+                });
+                $.ready(function() {
+                    //循环初始化所有下拉刷新，上拉加载。
+                    $.each(document.querySelectorAll('.mui-slider-group .mui-scroll'), function(index, pullRefreshEl) {
+                        $(pullRefreshEl).pullToRefresh({
+                            down: {
+                                callback: function() {
+                                    var self = this;
+                                    setTimeout(function() {
+                                        if (index === 0) {
+                                            $.getJSON("query.json", function(data) {
+                                                var dataReportList = data.data.reportList;
+                                                var ul = self.element.querySelector('.mui-table-view');
+                                                ul.insertBefore(createFragment(ul, index, pageSize, dataReportList, true), ul.firstChild);
+                                                self.endPullDownToRefresh();
+                                            });
+                                        } else {
+                                            $.getJSON("query.json", function(data) {
+                                                var dataunReportList = data.data.unReportList;
+                                                var ul = self.element.querySelector('.mui-table-view');
+                                                ul.insertBefore(createFragment(ul, index, pageSize, dataunReportList, true), ul.firstChild);
+                                                self.endPullDownToRefresh();
+                                            });
+                                        }
+
+                                    }, 1000);
+                                }
+                            },
+                            up: {
+                                callback: function() {
+                                    var self = this;
+                                    setTimeout(function() {
+                                        var ul = self.element.querySelector('.mui-table-view');
+                                        if (index === 0) {
+                                            $.getJSON("query.json", function(data) {
+                                                var dataReportList = data.data.reportList;
+                                                var ul = self.element.querySelector('.mui-table-view');
+                                                ul.appendChild(createFragment(ul, index, 5, dataReportList));
+                                                self.endPullUpToRefresh();
+                                            });
+                                        } else {
+                                            $.getJSON("query.json", function(data) {
+                                                var dataunReportList = data.data.unReportList;
+                                                var ul = self.element.querySelector('.mui-table-view');
+                                                ul.appendChild(createFragment(ul, index, 5, dataunReportList));
+                                                self.endPullUpToRefresh();
+                                            });
+                                        }
+
+                                    }, 1000);
+                                }
+                            }
+                        });
+                    });
+                    var createFragment = function(ul, index, count, myData, reverse) {
+                        var length = ul.querySelectorAll('li').length;
+                        var fragment = document.createDocumentFragment();
+                        var li;
+                        $.each(myData, function(key, val) {
+                            var detailLink = "/html/netCreditInquiry.html?userName=" + val.userName + "&idCard=" + val.idCard + "&orderNo=" + val.orderNo;
+                            li = document.createElement('li');
+                            li.className = 'mui-table-view-cell';
+                            li.innerHTML = `<div class="boxmsg"><p class="boxName">姓名： ${val.userName} </p>
+                            <p class="boxIdCard">身份证： ${val.idCard}</p>
+                            <p class="boxDetail">详情： <a href= ${detailLink} >点击查看</a></p></div>`;
+                            fragment.appendChild(li);
+                        });
+                        return fragment;
+
+                    };
+                });
+            }
+            )(mui);
+        </script>
+    </body>
+</html>

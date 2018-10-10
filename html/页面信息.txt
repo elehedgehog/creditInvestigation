@@ -1,0 +1,19 @@
+
+
+queryDetail 结果详情页
+
+queryResult 查询结果页（已上报·拟上报）
+
+aboutUs 关于我们
+
+enteringBrand 入驻品牌
+
+msgInform：  关于报送P2P平台借款人逃废债信息的通知
+
+netCreditInquiry 首页
+
+resultQueryDetail 结果详情页入口
+
+searchPage 逾期名单查询
+
+searchResult 逾期名单查询结果（已上报·拟上报）

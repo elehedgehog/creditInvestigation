@@ -1,0 +1,64 @@
+* {
+    margin: 0;
+    padding: 0;
+    font-family: "Microsoft YaHei";
+    /*touch-action: none;*/
+}
+html,
+body {
+    /*width: 100%;
+    height: 100%;*/
+}
+
+p{
+    white-space: normal;
+    margin: 0;
+}
+
+
+
+.cf:after,
+.cf:before {
+    content: '';
+    display: table;
+}
+
+.cf:after {
+    clear: both;
+}
+
+input,
+button {
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+    border: 0;
+    outline: none;
+}
+
+ul>li {
+        list-style: none;
+}
+header a{
+	color: #000000;
+}
+
+input{  
+
+    -webkit-user-select: auto;  
+
+}  
+
+input::-webkit-input-placeholder{
+        color: #95A3AB;
+}
+input::-moz-placeholder{   /* Mozilla Firefox 19+ */
+    color: #95A3AB;
+}
+input:-o-placeholder{    /* Mozilla Firefox 4 to 18 */
+    color: #95A3AB;
+}
+input:-ms-input-placeholder{  /* Internet Explorer 10-11 */ 
+    color: #95A3AB;
+}
+.mui-toast-container {bottom: 50% !important;}

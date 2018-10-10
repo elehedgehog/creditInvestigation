@@ -1,0 +1,339 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script type="text/javascript" src="../js/rem.js" ></script>
+    <title>321征信</title>
+    <link rel="stylesheet" href="../css/common.css"/>
+    <link rel="stylesheet" href="../css/mui.min.css" />
+    <link rel="stylesheet" href="../css/resultQueryDetail.css"/>
+	<link rel="stylesheet" href="../css/searchPage.css" />
+	<style>
+		body {
+			/* background: #dddddde6!important; */
+		}
+	</style>
+    
+</head>
+<body>
+	<header class="mui-bar mui-bar-nav">
+	    <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+	    <h1 class="mui-title">结果详情页</h1>
+	</header>
+	
+	<div class="mui-content" id="content">
+		<div class="content-border">
+			<div class="prompt-msg">如需查询详细信息，请先输入以下信息</div>
+			<div class="inputModule">
+				<div class="user-msg">
+					<p>逾期借款人姓名：<span id="userNameMsg">陈思思</span></p>
+					<p>身份证号：<span id="idCardMsg">4401051997****4211</span></p>
+				</div>
+				<div class="item">
+					<div class="item-input">
+						<input id="userName" placeholder="请输入生日部分"/>
+						<i class="clearValue"></i>
+					</div>
+				</div>
+				<div class="item">
+					<span>手机号( 必填 <i>*</i>)</span>
+					<div class="item-input">
+						<input id="phone" placeholder="请输入您的手机号"/>
+						<i class="clearValue"></i>
+					</div>
+				</div>
+				<div class="item" id="rightCode">
+					<span>验证码( 必填 <i>*</i>)</span>
+					<input id="checkCode" placeholder="请输入右侧验证码"/>
+					<!-- <img id="checkCodeImg" onclick="getNewCheckCode()" src="../images/icon/checkCodeImg.png"> -->
+				</div>
+				<div class="item">
+					<span>手机验证码( 必填 <i>*</i>)</span>
+					<input id="phoneCode" placeholder="请输入您的验证码"/>
+					<span class="getCode" onclick="getVerificationCode()" id="coundDown">获取验证码</span>
+				</div>
+				
+				<div class="buttonModule"><button onclick="submitSearch()">提交查询</button></div>
+			</div>
+			<div id="searchValue"></div>
+		</div>
+	</div>
+</body>
+
+<script src="../js/mui.min.js"></script>
+<script src="../js/jquery-1.11.1.min.js"></script>
+<script src="../js/common.js"></script>
+<script>
+	mui.init();
+	var count = 60;         //60秒倒计时
+    var timer = undefined
+	var isSumint = false
+	var param = decodeURI(document.location.href);
+	var arr = param.split('?')
+	var baseUrl = configData.URL
+	var checkCode = ''
+	var userName = ''
+	var phoneCode = ''
+	var phone = ''
+	var isRandomCode = false
+	if (arr[1]) {
+		var newArr = arr[1].split('&')
+		var userName, idCard, orderNo, reportStatus;
+		for(var i=0; i < newArr.length; i++) {
+				var item = newArr[i]
+				if (/userName=/.test(item)) {
+					userName = item.split('=')[1];
+					console.log(userName)
+					$('#userNameMsg').text(userName)
+				}
+				if (/idCard=/.test(item)) {
+					idCard = item.split('=')[1];
+					$('#idCardMsg').text(idCard)
+				}
+				if (/orderNo=/.test(item)) {
+					orderNo = item.split('=')[1];
+					localStorage.setItem('queryDetail_orderNo', orderNo)
+				}
+				if (/reportStatus=/.test(item)) {
+					reportStatus = item.split('=')[1];
+					localStorage.setItem('queryDetail_reportStatus', reportStatus)
+				}
+		}
+	}
+	//清空输入框内容
+	$('.clearValue').click(function(event){
+		event.target.previousElementSibling.value='';
+	});
+	$(".item-input").bind('input propertychange',function(event){
+		if(event.target.value !=''){
+			$(event.target).next().css('display','block');
+		}else{
+			$(event.target).next().css('display','none');
+		}
+	})
+	
+
+	$("#checkCode").on("input propertychange",function(){  //实时监测
+		if($(this).val() == ''){
+			isSumint = false// 变灰
+		} else {
+			isSumint = true
+		}
+	})
+	getCheckCode();
+	
+	function getCheckCode(){   //获取随机验证码接口
+		var params = JSON.stringify(
+			{ type: 2 }
+		)
+		mui.ajax( baseUrl + '/rs/api/credit/getRandomCode.action',{    
+			data: params,
+			dataType: 'json',
+        	contentType: 'application/json;charset=UTF-8',
+			type: 'post',
+			timeout: 10000,
+			success:function(data) {
+				//服务器返回响应，根据响应结果，分析是否登录成功；
+				console.log(data)
+				if (data.code == "200") {
+					// $('#checkCodeImg').attr('src',configData.URL + data.data.url);
+					if($('#checkCodeImg')){
+						$('#checkCodeImg').remove()
+					}
+					var str = '<img id="checkCodeImg" onclick="getNewCheckCode()" src='+ configData.URL + data.data.url +'>' 
+                    $('#rightCode').append(str)
+                    
+					//保存uuid结果详情页(queryDetail.html)用到
+	        		localStorage.setItem('queryDetail_uuid',data.data.uuid);
+				} else {
+					mui.toast(data.msg);
+				}
+				
+			},
+			error:function(xhr,type,errorThrown){
+				//异常处理；
+				console.log(type);
+			}
+		});
+	}
+	
+	function validateCode(){  //随机验证码校验接口
+		var params = JSON.stringify(
+			{ 
+				
+				randomCode: $('#checkCode').val(),
+				type: 2,
+				uuid: localStorage.queryDetail_uuid
+			}
+		)
+		mui.ajax( baseUrl + '/rs/api/credit/validateCode.action',{    
+			data: params,
+			dataType: 'json',
+        	contentType: 'application/json;charset=UTF-8',
+			type: 'post',
+			timeout: 10000,
+			success:function(data) {
+				console.log(data)
+				if (data.code == "200") {
+					isRandomCode = true
+					validateSmsCode()
+				} else {
+					getCheckCode()
+					mui.toast(data.msg);
+				}
+			},
+			error:function(xhr,type,errorThrown){
+				//异常处理；
+				console.log(type);
+			}
+		});
+		console.log('成功')
+	}
+	function getSms(){ //获取短信验证码接口
+			var params = JSON.stringify(
+				{
+					mobile: $('#phone').val(),
+					randomCode: $('#checkCode').val(),
+				}
+			)
+			mui.ajax( baseUrl + '/rs/api/credit/getSms.action',{    
+				data: params,
+				dataType: 'json',
+        		contentType: 'application/json;charset=UTF-8',
+				type: 'post',
+				timeout: 10000,
+				success:function(data) {
+					//服务器返回响应，根据响应结果，分析是否登录成功；
+					console.log(data)
+					if (data.code == "200") {
+
+					} else {
+						mui.toast(data.msg);
+					}
+					
+				},
+				error:function(xhr,type,errorThrown){
+					//异常处理；
+					console.log(type);
+				}
+			});
+		}
+	function getVerificationCode() {    //获取短信验证码按钮
+		if(!isSumint )  {
+			mui.toast('请先输入验证码');
+			return 
+		}
+		if (!timer) {
+			countDown();
+			timer = setInterval(countDown, 1000);
+			getSms()   //先获取到短信验证码 
+		}
+	
+	}
+	function validateSmsCode(){    //短信验证码校验接口  
+		var params = JSON.stringify(
+			{
+				code: phoneCode,
+				mobile: phone,
+			}
+		)
+		mui.ajax( baseUrl + '/rs/api/credit/validateSmsCode.action',{   
+			data: params,
+			dataType: 'json',
+        	contentType: 'application/json;charset=UTF-8',
+			type: 'post',
+			timeout: 10000,
+			success:function(data) {
+				console.log(data)
+				if (data.code == "200") {
+					localStorage.setItem('queryDetail_birthday', userName)
+					localStorage.setItem('queryDetail_mobile', phone)
+					localStorage.setItem('queryDetail_randomCode', checkCode)
+					localStorage.setItem('queryDetail_smsCode', phoneCode)
+					if(isRandomCode){
+						window.location.href = 'queryDetail.html'
+					} else {
+						mui.toast('随机验证码不通过');
+					}
+					
+				} else {
+					mui.toast(data.msg);
+					return
+				}
+			},
+			error:function(xhr,type,errorThrown){
+				//异常处理；
+				console.log(type);
+			}
+		});
+	}
+	
+	function getNewCheckCode(){  //刷新随机验证码按钮
+		getCheckCode()  //验证码
+	}
+	function countDown() {
+		if (count > 1) {
+			count--;
+			$('#coundDown').text(count + '秒');
+			$('#coundDown').css('width','1.1rem');
+
+		} else {
+			clearInterval(timer);
+			timer = undefined;
+			count = 60;
+			$('#coundDown').text('获取验证码');
+			$('#coundDown').css('width','1.7rem');
+		}
+	}
+	setInterval(function () {
+		if ($('#checkCode').val()) {
+			$('.getCode').addClass('on')
+		} else {
+			$('.getCode').removeClass('on')
+		}
+	}, 1000);
+	function submitSearch(){  //提交查詢按钮
+		userName = mui('#userName')[0].value;
+		checkCode = mui('#checkCode')[0].value;
+		phone = mui('#phone')[0].value;
+		phoneCode = mui('#phoneCode')[0].value;
+		var reg = /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/; 
+		var birth = /^\d{4}$/;
+		var word = /^\d{6}$/;
+		var tel = /^1([38][0-9]|4[579]|5[0-3,5-9]|6[6]|7[0135678]|9[89])\d{8}$/
+		if(!trim(userName)){
+			mui.toast('请输入生日后四位');
+		}else if(!birth.test(userName)){
+			mui.toast('请输入4位数');
+		}else if(!trim(phone)) {
+			mui.toast('请输入您的手机号码');
+		}else if(!tel.test(trim(phone))) {
+			mui.toast('请输入正确的手机号码');
+		}else if(!trim(checkCode)){
+			mui.toast('请输入验证码');
+		}else if(!trim(phoneCode)){
+			mui.toast('请输入手机验证码');
+		}else if(!word.test(trim(phoneCode))){
+			mui.toast('请输入6位数字手机验证码');
+		}else{
+			validateCode()
+		}
+		
+	}
+	//处理用户信息 张*三
+//	function changeUserMessage(str,type){
+//		if(type=='userName'){
+//			if(str.length>2){
+//				return str.substring(0,1)+'*'+str.substring(str.length-1);
+//			}else{
+//				return str.substring(0,1)+'*';
+//			}
+//		}else if(type=='idCard'){
+//			return str.substring(0,10)+'****'+str.substring(str.length-4);
+//		}
+//	}
+   
+	
+</script>
+</html>

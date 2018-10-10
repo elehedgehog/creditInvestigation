@@ -1,0 +1,157 @@
+html body{
+	background-color: #FFFFFF;
+}
+/*插件自带*/
+/*html,
+body {
+	background-color: #efeff4;
+}*/
+.mui-bar~.mui-content .mui-fullscreen {
+	top: 44px;
+	height: auto;
+}
+.mui-pull-top-tips {
+	position: absolute;
+	top: -20px;
+	left: 50%;
+	margin-left: -25px;
+	width: 40px;
+	height: 40px;
+	border-radius: 100%;
+	z-index: 1;
+}
+.mui-bar~.mui-pull-top-tips {
+	top: 24px;
+}
+.mui-pull-top-wrapper {
+	width: 42px;
+	height: 42px;
+	display: block;
+	text-align: center;
+	background-color: #efeff4;
+	border: 1px solid #ddd;
+	border-radius: 25px;
+	background-clip: padding-box;
+	box-shadow: 0 4px 10px #bbb;
+	overflow: hidden;
+}
+.mui-pull-top-tips.mui-transitioning {
+	-webkit-transition-duration: 200ms;
+	transition-duration: 200ms;
+}
+.mui-pull-top-tips .mui-pull-loading {
+	/*-webkit-backface-visibility: hidden;
+	-webkit-transition-duration: 400ms;
+	transition-duration: 400ms;*/
+	
+	margin: 0;
+}
+.mui-pull-top-wrapper .mui-icon,
+.mui-pull-top-wrapper .mui-spinner {
+	margin-top: 7px;
+}
+.mui-pull-top-wrapper .mui-icon.mui-reverse {
+	/*-webkit-transform: rotate(180deg) translateZ(0);*/
+}
+.mui-pull-bottom-tips {
+	text-align: center;
+	background-color: #efeff4;
+	font-size: 15px;
+	line-height: 40px;
+	color: #777;
+}
+.mui-pull-top-canvas {
+	overflow: hidden;
+	background-color: #fafafa;
+	border-radius: 40px;
+	box-shadow: 0 4px 10px #bbb;
+	width: 40px;
+	height: 40px;
+	margin: 0 auto;
+}
+.mui-pull-top-canvas canvas {
+	width: 40px;
+}
+.mui-slider-indicator.mui-segmented-control {
+	background-color: #efeff4;
+}
+/*插件自带*/
+
+
+/*逾期名单查询*/
+
+.queryPage .menuTime{width:100%!important}
+.queryPage .menuTime a{font-size:.32rem;display:block;width:3.75rem;height:.8rem;line-height:.8rem;float:left;text-align:center}
+.queryPage .menuTime .mui-control-item{background:url(../images/query/whileBtn.png) no-repeat !important;background-size:100% 100% !important;color:#fea331;width:50%;height:100%;line-height:40px}
+.queryPage .menuTime .mui-active{background:url(../images/query/orangeBtn.png) no-repeat !important;background-size:100% 100% !important;color:#fff !important;width:50%;height:100%;line-height:40px}
+/*结果详情页*/
+.queryDetail .head{
+    background:url(../images/query/head.png) no-repeat;
+    background-size:100% 100%;
+    display: inline-block;
+    width: .42rem;
+    height: .42rem;
+}
+.queryDetail .itemContent{
+    padding: .2rem 0 .4rem .3rem;
+}
+.boxmsg{font-size:.28rem;color:#666;background:#eee;padding:.2rem;border-radius:.2rem}
+
+
+
+/*修改*/
+.mui-slider .mui-segmented-control.mui-segmented-control-inverted~.mui-slider-group .mui-slider-item{
+	border-top: none !important;
+}
+.mui-fullscreen .mui-segmented-control~.mui-slider-group{
+	top: 100px;
+}
+.result-info{
+	position: relative;
+	z-index: 1;
+	font-size: 0.25rem !important;
+	line-height: 0.35rem;
+	color: #ff4343;
+	width: 90%;
+	margin:0 auto;
+	padding: 10px 0px;
+	background-color: #FFFFFF;
+}
+.mui-table-view-cell:after{
+	height: 0 !important;
+}
+
+.NoResult{
+	height: 2.5rem;
+	background-color: #FFFFFF;
+}
+.NoResult .NoResult-title{
+	width: 85%;
+	margin: 0 auto;
+	text-align:center;
+	line-height: 0.8rem;
+	border-bottom: 1px solid #E5E5E5; 
+}
+.NoResult-info{
+	text-align:center ;
+	font-size: 0.28rem;
+	line-height: 1.2rem;
+}
+.NoResult-info span{
+	padding-right: 0.2rem;
+}
+#scroll1NoData,#scroll2NoData{
+	width: 100%;
+	text-align: center;
+	margin-top: 0.5rem;
+	font-size: 0.32rem;
+	color: #DADADA;
+}
+
+/*不分页时要滚动  如果分页去掉就好*/
+.mui-scroll-wrapper{
+	overflow: scroll !important;
+}
+
+
+/*修改结束*/

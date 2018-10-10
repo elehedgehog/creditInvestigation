@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>321征信</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<script type="text/javascript" src="../js/rem.js"></script>
+		<link rel="stylesheet" href="../css/mui.min.css">
+		<link rel="stylesheet" href="../css/common.css"/>
+		<link rel="stylesheet" href="../css/newSearchResult.css">
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">查询结果</h1>
+		</header>
+		<div class="mui-content">
+			<div class="searchResultTitle">
+				<span id="searchName">李三宝</span>( <span id="userIdCard">441883198801013622</span> )有以下查询结果
+			</div>
+			
+			<div class="NoResult-info">
+				<span>暂无查询结果</span>
+				<a href="searchPage.html">重填查询内容</a>
+			</div>
+			
+			<div class="searchResultList">
+				<!--<div class="resultItem">
+					<div class="Item-list productModul">
+						<span>产品</span>
+						<span class="productName">随薪贷</span>
+					</div>
+					<div class="Item-list loandModule">
+						<span>放款本金(元)</span>
+						<span class="loanMoney">6000</span>
+					</div>
+					<div class="Item-list waitPayModule">
+						<span>待还逾期本金(元)</span>
+						<span class="waitPay">2000</span>
+					</div>
+					<div class="Item-list reportModule">
+						<span>是否上包报</span>
+						<span class="report">已上报</span>
+					</div>
+					<div class="centerLine"></div>
+				</div>-->
+				
+				
+			</div>
+		</div>
+		<script src="../js/mui.min.js"></script>
+		<script src="../js/mui.pullToRefresh.js"></script>
+		<script src="../js/mui.pullToRefresh.material.js"></script>
+		<script src="../js/jquery-1.11.1.min.js"></script>
+		<script src="../js/common.js"></script>
+		<script>
+			mui.init();
+
+			var idCardVal=localStorage.getItem('searchPage_userIdCard')
+			var randomCodeVal=localStorage.getItem('searchPage_randomCode')
+			var userNameVal=localStorage.getItem('searchPage_userName')
+			var uuidVal=localStorage.getItem('searchPage_uuid')
+			$('#searchName').text(userNameVal);
+			$('#userIdCard').text(idCardVal);
+			
+            
+            var params = JSON.stringify(
+				{ type: 1, }
+			);
+            initData();
+            function initData() {
+				var getDiscreditListByParamsArgs = JSON.stringify({
+                    idCard: idCardVal,
+                    randomCode: randomCodeVal,
+                    userName: userNameVal,
+					uuid:uuidVal
+                });
+            	$.ajax({
+					type:"post",//调接口要改成POST
+					url:configData.URL +'/rs/api/credit/getDiscreditListByParams.action',
+					data: getDiscreditListByParamsArgs,
+					dataType: "json",
+        			contentType: 'application/json;charset=UTF-8',
+			        success: function(data){
+			        	console.log(data)
+			        	if(data.code=='200'){
+			        		var reportList = data.data.reportList;
+							// 空数据
+							console.log(reportList);
+		                    if(reportList.length=='0'){
+		                    	$('.NoResult-info').show();
+		                    	$('.searchResultList').hide();
+		                    	return;
+		                    }
+		                    
+		                    $.each(reportList, function(key, val) {
+		                      	var searchResultItem=`<div class="resultItem">
+									<div class="Item-list productModul">
+										<span>产品</span>
+										<span class="productName">${val.productName}</span>
+									</div>
+									<div class="Item-list loandModule">
+										<span>放款本金(元)</span>
+										<span class="loanMoney">${val.loanAmount}</span>
+									</div>
+									<div class="Item-list waitPayModule">
+										<span>待还逾期本金(元)</span>
+										<span class="waitPay">${val.overdueRepayPrincipal==''? '' : val.overdueRepayPrincipal}</span>
+									</div>
+									<div class="Item-list reportModule">
+										<span>是否上报</span>
+										<span class="report">${val.creditStatus==1? '已上报' : '拟上报'}</span>
+									</div>
+									<div class="centerLine"></div>
+								</div>`;
+								var newDiv= document.createElement('div');
+								newDiv.innerHTML=searchResultItem;
+								$('.searchResultList').append(newDiv);
+							
+		                    });	
+		                   
+			        	}else{
+			        		mui.toast('请求失败');
+			        	}
+						
+			     	},
+			     	error: function(XMLHttpRequest, textStatus, errorThrown) {
+			     		mui.toast('网络出错,稍后再试')
+			        }
+				})
+            }
+		</script>
+	</body>
+
+</html>

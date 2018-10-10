@@ -1,0 +1,173 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script type="text/javascript" src="../js/rem.js" ></script>
+    <title>321征信</title>
+    <link rel="stylesheet" href="../css/common.css"/>
+    <link rel="stylesheet" href="../css/mui.min.css" />
+    <link rel="stylesheet" href="../css/searchPage.css" />
+    
+</head>
+<body>
+	<header class="mui-bar mui-bar-nav">
+	    <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+	    <h1 class="mui-title">逾期名单查询</h1>
+	</header>
+	
+	<div class="mui-content" id="content">
+		<div class="TipsModule">
+			<div class="TipsModule-title">温馨提示</div>
+			<span class="first-info">逾期借款名单来自入驻品牌,与321征信无关</span>
+			<!--<span class="second-info">如需精确查询,建议同时提供姓名和电话号码</span>-->
+		</div>
+		
+		<div class="inputModule">
+			<div class="item">
+				<span>逾期借款人姓名( 必填 <i>*</i>)</span>
+				<div class="item-input">
+					<input id="userName" placeholder="请输入完整的姓名"/>
+					<i class="clearValue"></i>
+				</div>
+				
+			</div>
+			<div class="item">
+				<span>身份证号码( 必填 <i>*</i> )</span>
+				<div class="item-input">
+					<input id="idCard" placeholder="请输入完整的身份证号"/>
+					<i class="clearValue"></i>
+				</div>
+				
+			</div>
+			<div class="item" id="rightCode">
+				<span>验证码( 必填 <i>*</i>)</span>
+				<input id="checkCode" placeholder="请输入右侧验证码"/>
+				<!--<img id="checkCodeImg" onclick="getNewCheckCode()" src="">-->
+			</div>
+			
+			<div class="buttonModule"><button onclick="submitSearch()">提交查询</button></div>
+		</div>
+		<div id="searchValue"></div>
+	</div>
+	
+</body>
+
+
+<script src="../js/mui.min.js"></script>
+<script src="../js/common.js"></script>
+<script src="../js/jquery-1.11.1.min.js"></script>
+<script>
+	console.log(configData.URL);
+	mui.init();
+	//清空输入框内容
+	$('.clearValue').click(function(event){
+		event.target.previousElementSibling.value='';
+	});
+	$(".item-input").bind('input propertychange',function(event){
+		if(event.target.value !=''){
+			$(event.target).next().css('display','block');
+		}else{
+			$(event.target).next().css('display','none');
+		}
+	})
+	
+	getCheckCode();
+	function getCheckCode(){
+		var params = JSON.stringify(
+			{ type: 1 }
+		)
+		$.ajax({
+			dataType: 'json',
+            contentType: 'application/json',
+			type:"POST",
+			url:configData.URL+"/rs/api/credit/getRandomCode.action",
+			data: params,
+			dataType: "json",
+	        success: function(data){
+	        	if(data.code=='200'){
+	        		// $('#checkCodeImg').attr('src',configData.URL + "data:image/jpeg;base64,"+data.data.url);
+//	        		$('#checkCodeImg').attr('src',configData.URL + data.data.url);
+					if($('#checkCodeImg')){
+						$('#checkCodeImg').remove()
+					}
+	        		var str = '<img id="checkCodeImg" onclick="getNewCheckCode()" src='+ configData.URL + data.data.url +'>' 
+                    $('#rightCode').append(str);
+	        		//保存uuid查询结果页(searchResult.html)用到
+	        		localStorage.setItem('searchPage_uuid',data.data.uuid);
+	        	}else{
+	        		mui.toast('获取验证码失败')
+	        	}
+//				localStorage.getItem('searchPage_uuid')
+	     	},
+	     	error: function(XMLHttpRequest, textStatus, errorThrown) {
+	     		mui.toast('网络出错')
+	        }
+		})
+	}
+	function getNewCheckCode(){
+		
+		getCheckCode();
+	}
+	function submitSearch(){
+		var userName = trim(mui('#userName')[0].value);
+		var idCard = trim(mui('#idCard')[0].value);
+		var checkCode = trim(mui('#checkCode')[0].value);
+		var reg = /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/; 
+		var word = /^[\u4e00-\u9fa5]+$/;
+		
+		if(!userName){
+			mui.toast('请输入姓名');
+		}else if(!word.test(userName)){
+			mui.toast('姓名请输入汉字');
+		}else if(!idCard){
+			mui.toast('请输入身份证号');
+		}else if(!reg.test(idCard)){
+			mui.toast('请输入正确的身份证号');
+		}else if(!checkCode){
+			mui.toast('请输入验证码');
+		}else{
+			checkCheckCode();
+		}
+		
+		
+	    function checkCheckCode(){
+			var params = JSON.stringify(//随机验证码校验 
+				{ 
+					randomCode:trim(mui('#checkCode')[0].value),
+					type: 1,
+					uuid: localStorage.searchPage_uuid
+				}
+			)
+			$.ajax({
+			type:"POST",
+			url:configData.URL+"/rs/api/credit/validateCode.action",
+			data: params,
+			dataType: "json",
+        	contentType: 'application/json;charset=UTF-8',
+	        success: function(data){
+	        	if(data.code=='200'){
+	        		submitMessage()
+	        	}else{
+	        		getCheckCode();
+	        		mui.toast(data.msg)
+	        	}
+	     	},
+	     	error: function(XMLHttpRequest, textStatus, errorThrown) {
+	     		mui.toast('获取数据失败')
+	        }
+		})
+	   		
+	    }
+	   
+	   //与所有验证通过后调到结果页
+	   function submitMessage(){
+	   	localStorage.setItem('searchPage_userName',userName);
+	   	localStorage.setItem('searchPage_userIdCard',idCard);
+	   	localStorage.setItem('searchPage_randomCode',checkCode);
+	   	window.location.href='newSearchResult.html';
+	   }
+	     
+	}
+</script>
+</html>
